@@ -23,7 +23,7 @@ TEST(GeneralTests, Integer)
 	{
 		pqxx::work W(C);
 		pqxx::result R1(W.exec("CREATE TABLE numbers (n INTEGER);"));
-		pqxx::result R2(W.exec("INSERT INTO numbers (n) values (2), (3), (5);"));
+		pqxx::result R2(W.exec("INSERT INTO numbers (n) VALUES (2), (3), (5);"));
 		pqxx::result R3(W.exec("SELECT n FROM numbers;"));
 
 		pqxx::result::const_iterator i = R3.begin();
@@ -55,7 +55,7 @@ TEST(GeneralTests, Real)
 	{
 		pqxx::work W(C);
 		pqxx::result R1(W.exec("CREATE TABLE numbers (f REAL);"));
-		pqxx::result R2(W.exec("INSERT INTO numbers (f) values (1.414), (1.732), (2);"));
+		pqxx::result R2(W.exec("INSERT INTO numbers (f) VALUES (1.414), (1.732), (2);"));
 		pqxx::result R3(W.exec("SELECT f FROM numbers;"));
 
 		pqxx::result::const_iterator i = R3.begin();
@@ -87,7 +87,7 @@ TEST(GeneralTests, Text)
 	{
 		pqxx::work W(C);
 		pqxx::result R1(W.exec("CREATE TABLE users (name VARCHAR);"));
-		pqxx::result R2(W.exec("INSERT INTO users (name) values ('Alice'), ('Bob'), ('Carol');"));
+		pqxx::result R2(W.exec("INSERT INTO users (name) VALUES ('Alice'), ('Bob'), ('Carol');"));
 		pqxx::result R3(W.exec("SELECT name FROM users;"));
 
 		pqxx::result::const_iterator i = R3.begin();
@@ -119,7 +119,7 @@ TEST(GeneralTests, Select)
 	{
 		pqxx::work W(C);
 		pqxx::result R1(W.exec("CREATE TABLE users (id INTEGER, name VARCHAR, score FLOAT);"));
-		pqxx::result R2(W.exec("INSERT INTO users (id, name, score) values (1, 'Alice', 9.1), (2, 'Bob', 9.2);"));
+		pqxx::result R2(W.exec("INSERT INTO users (id, name, score) VALUES (1, 'Alice', 9.1), (2, 'Bob', 9.2);"));
 		pqxx::result R3(W.exec("SELECT id, name, score FROM users;"));
 
 		pqxx::result::const_iterator i = R3.begin();
@@ -154,7 +154,7 @@ TEST(GeneralTests, Delete)
 	{
 		pqxx::work W(C);
 		pqxx::result R1(W.exec("CREATE TABLE users (id INTEGER, name VARCHAR, score FLOAT);"));
-		pqxx::result R2(W.exec("INSERT INTO users (id, name, score) values (1, 'Alice', 9.1), (2, 'Bob', 9.2), (3, 'Carol', 9.3);"));
+		pqxx::result R2(W.exec("INSERT INTO users (id, name, score) VALUES (1, 'Alice', 9.1), (2, 'Bob', 9.2), (3, 'Carol', 9.3);"));
 		pqxx::result R3(W.exec("DELETE FROM users WHERE id = 2;"));
 		CHECK_EQUAL(1, R3.affected_rows());
 		pqxx::result R4(W.exec("SELECT id, name, score FROM users;"));
@@ -191,7 +191,7 @@ TEST(GeneralTests, NullCheck)
 	{
 		pqxx::work W(C);
 		pqxx::result R1(W.exec("CREATE TABLE users (id INTEGER, name VARCHAR);"));
-		pqxx::result R2(W.exec("INSERT INTO users (id, name) values (NULL, NULL);"));
+		pqxx::result R2(W.exec("INSERT INTO users (id, name) VALUES (NULL, NULL);"));
 		pqxx::result R3(W.exec("SELECT id, name FROM users;"));
 
 		pqxx::result::const_iterator i = R3.begin();
@@ -217,7 +217,7 @@ TEST(GeneralTests, ExplicitAbort)
 	}
 	{
 		pqxx::work W(C);
-		pqxx::result R1(W.exec("INSERT INTO users (name) values ('Alice'), ('Bob'), ('Carol');"));
+		pqxx::result R1(W.exec("INSERT INTO users (name) VALUES ('Alice'), ('Bob'), ('Carol');"));
 		W.abort(); // abort!
 	}
 	{
@@ -237,7 +237,7 @@ TEST(GeneralTests, ImplicitAbort)
 	}
 	{
 		pqxx::work W(C);
-		pqxx::result R1(W.exec("INSERT INTO users (name) values ('Alice'), ('Bob'), ('Carol');"));
+		pqxx::result R1(W.exec("INSERT INTO users (name) VALUES ('Alice'), ('Bob'), ('Carol');"));
 		// no abort!
 	}
 	{
@@ -253,7 +253,7 @@ TEST(GeneralTests, Iterator)
 	{
 		pqxx::work W(C);
 		pqxx::result R1(W.exec("CREATE TABLE users (name VARCHAR);"));
-		pqxx::result R2(W.exec("INSERT INTO users (name) values ('Alice'), ('Bob');"));
+		pqxx::result R2(W.exec("INSERT INTO users (name) VALUES ('Alice'), ('Bob');"));
 		pqxx::result R3(W.exec("SELECT name FROM users;"));
 
 		pqxx::result::const_iterator i = R3.begin();
