@@ -35,16 +35,9 @@ void work::abort() {
 	done = true;
 }
 
-result work::exec(const std::string & q) {
-	sqlite3_stmt *stmt = NULL;
+void work::exec(sqlite3_stmt * stmt, result & r) {
 	int status;
 
-	status = sqlite3_prepare_v2(this->conn->db, q.c_str(), q.length(), &stmt, NULL);
-	if (status != SQLITE_OK) {
-		// error
-	}
-
-	result r;
 	while (true) {
 		status = sqlite3_step(stmt);
 		if (status == SQLITE_ROW) {
@@ -79,6 +72,19 @@ result work::exec(const std::string & q) {
 		}
 	}
 	r.changes = sqlite3_changes(this->conn->db);
+}
+
+result work::exec(const std::string & q) {
+	sqlite3_stmt *stmt = NULL;
+	int status;
+	result r;
+
+	status = sqlite3_prepare_v2(this->conn->db, q.c_str(), q.length(), &stmt, NULL);
+	if (status != SQLITE_OK) {
+		// error
+	}
+
+	exec(stmt, r);
 
 	status = sqlite3_finalize(stmt);
 	if (status != SQLITE_OK) {
@@ -86,6 +92,13 @@ result work::exec(const std::string & q) {
 	}
 
 	return r;
+}
+
+prepare::invocation work::prepared(const std::string & name) {
+	std::string statement = (* conn->prepared)[name];
+	sqlite3_stmt * stmt;
+	sqlite3_prepare_v2(conn->db, statement.c_str(), statement.length(), &stmt, NULL); // prepare sqlite3_stmt for each execution.
+	return prepare::invocation(this, stmt);
 }
 
 }

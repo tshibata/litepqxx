@@ -11,6 +11,7 @@ connection::connection(const std::string & options) {
 	if (status != SQLITE_OK) {
 		// error
 	}
+	prepared = std::shared_ptr<std::map<std::string, std::string>>(new std::map<std::string, std::string>());
 }
 
 connection::~connection() {
@@ -18,6 +19,10 @@ connection::~connection() {
 	if (status != SQLITE_OK) {
 		// error
 	}
+}
+
+void connection::prepare(const std::string & name, const std::string & statement) {
+	(* prepared)[name] = statement;
 }
 
 }

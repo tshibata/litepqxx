@@ -1,5 +1,6 @@
 #include <memory>
 #include <list>
+#include <map>
 #include <vector>
 #include <sqlite3.h>
 namespace lite
@@ -8,14 +9,15 @@ namespace pqxx
 {
 
 class work;
-
 class connection {
 friend work;
 public:
 	connection(const std::string & options);
 	~connection() noexcept; // to be virtual?
+	void prepare(const std::string & name, const std::string & statement);
 private:
 	sqlite3 * db;
+	std::shared_ptr<std::map<std::string, std::string>> prepared;
 };
 
 class result {
@@ -81,17 +83,36 @@ private:
 	std::shared_ptr<std::list<std::vector<std::unique_ptr<result::field>>>> rows;
 };
 
+class prepare {
+public:
+	class invocation {
+	friend work;
+		work * w;
+		sqlite3_stmt * stmt;
+		int count;
+		invocation(work * w, sqlite3_stmt * stmt);
+	public:
+		~invocation() noexcept;
+		result exec();
+		template<typename T> invocation & operator() (const T & value);
+		template<typename T> invocation & operator() (T * value);
+	};
+};
+
 class work {
 friend connection;
+friend prepare;
 private:
 	const connection * conn;
 	bool done;
+	void exec(sqlite3_stmt * stmt, result & r);
 public:
 	work(const connection & c);
 	~work() noexcept ; // to be virtual?
 	void commit();
 	void abort();
 	result exec(const std::string & q);
+	prepare::invocation prepared(const std::string & name);
 };
 
 }

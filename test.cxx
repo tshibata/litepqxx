@@ -1,6 +1,8 @@
 #include <CppUTest/CommandLineTestRunner.h>
 #include "litepqxx.h"
 
+#include <iostream>
+
 using namespace lite;
 
 TEST_GROUP(GeneralTests)
@@ -269,6 +271,32 @@ TEST(GeneralTests, Iterator)
 		CHECK(! i[0].is_null());
 		STRCMP_EQUAL("Bob", i[0].as<std::string>().c_str());
 		CHECK(i == (i++)); // suffixed ++
+
+		CHECK(i == R3.end());
+
+		W.commit();
+	}
+}
+
+TEST(GeneralTests, Prepared)
+{
+	pqxx::connection C(":memory:");
+	{
+		pqxx::work W(C);
+		C.prepare("ins", "INSERT INTO users (id, name) VALUES ($1, $2);");
+		pqxx::result R1(W.exec("CREATE TABLE users (id INTEGER, name VARCHAR);"));
+		pqxx::result R2 = W.prepared("ins")(1)("Alice").exec();
+		pqxx::result R3(W.exec("SELECT id, name FROM users;"));
+
+		pqxx::result::const_iterator i = R3.begin();
+
+		CHECK(i != R3.end());
+
+		CHECK(! i[0].is_null());
+		CHECK_EQUAL(1, i[0].as<int>());
+		CHECK(! i[1].is_null());
+		STRCMP_EQUAL("Alice", i[1].as<std::string>().c_str());
+		++ i;
 
 		CHECK(i == R3.end());
 
