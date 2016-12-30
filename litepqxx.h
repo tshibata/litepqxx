@@ -55,6 +55,15 @@ public:
 		text_field(const unsigned char * value);
 		std::string as_text() const;
 	};
+	class blob_field : public field {
+	private:
+		size_t length;
+		void * address;
+	public:
+		blob_field(const void * addr, size_t len);
+		~blob_field() noexcept;
+		std::string as_text() const;
+	};
 	class null_field : public field {
 	public:
 		bool is_null() const;
@@ -97,6 +106,17 @@ public:
 		template<typename T> invocation & operator() (const T & value);
 		template<typename T> invocation & operator() (T * value);
 	};
+};
+
+class binarystring {
+friend prepare;
+private:
+	void * address;
+	size_t length;
+public:
+	binarystring (const std::string & s);
+	binarystring (const void * addr, size_t len);
+	~binarystring () noexcept;
 };
 
 class work {

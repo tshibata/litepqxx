@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 #include "litepqxx.h"
 
 namespace lite
@@ -62,6 +63,19 @@ result::text_field::text_field(const unsigned char * value) {
 
 std::string result::text_field::as_text() const {
 	return value;
+}
+
+result::blob_field::blob_field(const void * addr, size_t len) : length(len) {
+	address = malloc(length);
+	memcpy(address, addr, length);
+}
+
+result::blob_field::~blob_field() {
+	free(address);
+}
+
+std::string result::blob_field::as_text() const {
+	return std::string((char *) address, length);
 }
 
 bool result::null_field::is_null () const {

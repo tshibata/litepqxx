@@ -58,8 +58,8 @@ void work::exec(sqlite3_stmt * stmt, result & r) {
 					// or sqlite3_column_text16?
 					break;
 				case SQLITE_BLOB:
+					row[i] = std::unique_ptr<result::field>(new result::blob_field(sqlite3_column_blob(stmt, i), sqlite3_column_bytes(stmt, i)));
 					break;
-					// not implemented yet
 				case SQLITE_NULL:
 					row[i] = std::unique_ptr<result::field>(new result::null_field());
 					break;

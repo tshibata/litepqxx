@@ -115,6 +115,50 @@ TEST(GeneralTests, Text)
 	}
 }
 
+TEST(GeneralTests, Binary)
+{
+	pqxx::connection C(":memory:");
+	{
+		char data[] = {1, 0, 9};
+		pqxx::binarystring alice(data, 3);
+		pqxx::binarystring bob("HANDS");
+
+		pqxx::work W(C);
+		C.prepare("ins", "INSERT INTO users (name, hash) VALUES ($1, $2);");
+		pqxx::result R1(W.exec("CREATE TABLE users (name VARCHAR, hash BLOB);")); // sorry but SQLite3 doesn't know BYTEA
+		pqxx::result R2 = W.prepared("ins")("Alice")(alice).exec();
+		pqxx::result R3 = W.prepared("ins")("Bob")(bob).exec();
+		pqxx::result R4(W.exec("SELECT name, hash FROM users;"));
+
+		pqxx::result::const_iterator i = R4.begin();
+
+		CHECK(i != R4.end());
+
+		CHECK(! i[0].is_null());
+		STRCMP_EQUAL("Alice", i[0].as<std::string>().c_str());
+		CHECK(! i[1].is_null());
+		// MEMCMP_EQUAL is not declared
+		CHECK_EQUAL(3, i[1].as<std::string>().length());
+		CHECK_EQUAL(1, i[1].as<std::string>().c_str()[0]);
+		CHECK_EQUAL(0, i[1].as<std::string>().c_str()[1]);
+		CHECK_EQUAL(9, i[1].as<std::string>().c_str()[2]);
+		++ i;
+
+		CHECK(i != R4.end());
+
+		CHECK(! i[0].is_null());
+		STRCMP_EQUAL("Bob", i[0].as<std::string>().c_str());
+		CHECK(! i[1].is_null());
+		STRCMP_EQUAL("HANDS", i[1].as<std::string>().c_str());
+		++ i;
+
+		CHECK(i == R4.end());
+
+		W.commit();
+
+	}
+}
+
 TEST(GeneralTests, Select)
 {
 	pqxx::connection C(":memory:");
