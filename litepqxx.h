@@ -135,6 +135,29 @@ public:
 	prepare::invocation prepared(const std::string & name);
 };
 
+class sql_error: std::exception {
+};
+
+class insufficient_resources: sql_error {
+};
+
+class disk_full: insufficient_resources {
+};
+
+class out_of_memory: insufficient_resources {
+};
+
+class integrity_constraint_violation : sql_error {
+};
+
+class syntax_error: sql_error {
+};
+
+class internal_error: sql_error {
+};
+
+void check_sqlite3(int code);
+
 }
 }
 

@@ -10,28 +10,22 @@ work::work(const connection & c) {
 	// block other threads?
 	done = false;
 	conn = & c;
-	int status = sqlite3_exec(conn->db, "BEGIN;", NULL, NULL, NULL);
+	check_sqlite3(sqlite3_exec(conn->db, "BEGIN", NULL, NULL, NULL));
 }
 
 work::~work() {
 	if (! done) {
-		abort();
+		sqlite3_exec(conn->db, "ROLLBACK", NULL, NULL, NULL);
 	}
 }
 
 void work::commit() {
-	int status = sqlite3_exec(conn->db, "COMMIT;", NULL, NULL, NULL);
-	if (status != SQLITE_OK) {
-		// error
-	}
+	check_sqlite3(sqlite3_exec(conn->db, "COMMIT", NULL, NULL, NULL));
 	done = true;
 }
 
 void work::abort() {
-	int status = sqlite3_exec(conn->db, "ROLLBACK;", NULL, NULL, NULL);
-	if (status != SQLITE_OK) {
-		// error
-	}
+	check_sqlite3(sqlite3_exec(conn->db, "ROLLBACK", NULL, NULL, NULL));
 	done = true;
 }
 
@@ -63,12 +57,14 @@ void work::exec(sqlite3_stmt * stmt, result & r) {
 				case SQLITE_NULL:
 					row[i] = std::unique_ptr<result::field>(new result::null_field());
 					break;
+				default:
+					throw internal_error();
 				}
 			}
 		} else if (status == SQLITE_DONE) {
 			break;
 		} else {
-			// error
+			throw internal_error();
 		}
 	}
 	r.changes = sqlite3_changes(this->conn->db);
@@ -79,17 +75,9 @@ result work::exec(const std::string & q) {
 	int status;
 	result r;
 
-	status = sqlite3_prepare_v2(this->conn->db, q.c_str(), q.length(), &stmt, NULL);
-	if (status != SQLITE_OK) {
-		// error
-	}
-
+	check_sqlite3(sqlite3_prepare_v2(this->conn->db, q.c_str(), q.length(), &stmt, NULL));
 	exec(stmt, r);
-
-	status = sqlite3_finalize(stmt);
-	if (status != SQLITE_OK) {
-		// error
-	}
+	check_sqlite3(sqlite3_finalize(stmt));
 
 	return r;
 }
@@ -97,7 +85,7 @@ result work::exec(const std::string & q) {
 prepare::invocation work::prepared(const std::string & name) {
 	std::string statement = (* conn->prepared)[name];
 	sqlite3_stmt * stmt;
-	sqlite3_prepare_v2(conn->db, statement.c_str(), statement.length(), &stmt, NULL); // prepare sqlite3_stmt for each execution.
+	check_sqlite3(sqlite3_prepare_v2(conn->db, statement.c_str(), statement.length(), &stmt, NULL)); // prepare sqlite3_stmt for each execution.
 	return prepare::invocation(this, stmt);
 }
 

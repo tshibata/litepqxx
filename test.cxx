@@ -348,6 +348,29 @@ TEST(GeneralTests, Prepared)
 	}
 }
 
+TEST(GeneralTests, SyntaxError)
+{
+	pqxx::connection C(":memory:");
+	try {
+		pqxx::work W(C);
+		pqxx::result R1(W.exec("THIS IS NOT A SQL STATEMENT"));
+		FAIL("pqxx::syntax_error is expected");
+	} catch (const pqxx::syntax_error & ex) {
+	}
+}
+
+TEST(GeneralTests, PreparedSyntaxError)
+{
+	pqxx::connection C(":memory:");
+	try {
+		pqxx::work W(C);
+		C.prepare("not_a_sql", "THIS IS NOT A SQL STATEMENT");
+		pqxx::result R1 = W.prepared("not_a_sql").exec();
+		FAIL("pqxx::syntax_error is expected");
+	} catch (const pqxx::syntax_error & ex) {
+	}
+}
+
 int main(int argc, char** argv)
 {
 	return CommandLineTestRunner::RunAllTests(argc, argv);

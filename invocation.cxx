@@ -14,30 +14,22 @@ prepare::invocation::~invocation() {
 }
 
 template<> prepare::invocation & prepare::invocation::operator() (const int & value) {
-	if (sqlite3_bind_int(stmt, ++ count, value) != SQLITE_OK) {
-		// error
-	}
+	check_sqlite3(sqlite3_bind_int(stmt, ++ count, value));
 	return * this;
 }
 
 template<> prepare::invocation & prepare::invocation::operator() (const std::string & value) {
-	if (sqlite3_bind_text(stmt, ++ count, value.c_str(), value.length(), SQLITE_TRANSIENT) != SQLITE_OK) {
-		// error
-	}
+	check_sqlite3(sqlite3_bind_text(stmt, ++ count, value.c_str(), value.length(), SQLITE_TRANSIENT));
 	return * this;
 }
 
 template<> prepare::invocation & prepare::invocation::operator() (const binarystring & value) {
-	if (sqlite3_bind_blob(stmt, ++ count, value.address, value.length, SQLITE_TRANSIENT) != SQLITE_OK) {
-		// error
-	}
+	check_sqlite3(sqlite3_bind_blob(stmt, ++ count, value.address, value.length, SQLITE_TRANSIENT));
 	return * this;
 }
 
 template<> prepare::invocation & prepare::invocation::operator() (const char * value) {
-	if (sqlite3_bind_text(stmt, ++ count, value, -1, SQLITE_TRANSIENT) != SQLITE_OK) {
-		// error
-	}
+	check_sqlite3(sqlite3_bind_text(stmt, ++ count, value, -1, SQLITE_TRANSIENT));
 	return * this;
 }
 
