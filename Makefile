@@ -1,7 +1,7 @@
 
 CC = g++
 CFLAGS = -std=c++11
-SRCS = connection.cxx work.cxx prepare.cxx result.cxx const_iterator.cxx field.cxx binarystring.cxx
+SRCS = connection.cxx work.cxx invocation.cxx result.cxx const_iterator.cxx field.cxx binarystring.cxx
 OBJS = $(SRCS:.cxx=.o)
 
 all: test.exe
