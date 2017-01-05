@@ -1,8 +1,11 @@
 
 CC = g++
 CFLAGS = -std=c++11
-SRCS = connection.cxx work.cxx invocation.cxx result.cxx const_iterator.cxx field.cxx binarystring.cxx error.cxx
-OBJS = $(SRCS:.cxx=.o)
+SRC = src
+OBJ = obj
+
+SRCFILES = $(wildcard $(SRC)/*.cxx)
+OBJFILES = $(patsubst $(SRC)/%.cxx, $(OBJ)/%.o, $(SRCFILES))
 
 all: test.exe
 	env LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH ./test.exe
@@ -10,12 +13,16 @@ all: test.exe
 test.exe: test.cxx liblitepqxx.so
 	$(CC) $(CFLAGS) -o test.exe test.cxx -L. -lCppUTest -llitepqxx -lsqlite3
 
-liblitepqxx.so: $(OBJS)
-	$(CC) $(CFLAGS) -shared -o liblitepqxx.so $(OBJS)
+liblitepqxx.so: $(OBJFILES)
+	$(CC) $(CFLAGS) -shared -o liblitepqxx.so $(OBJFILES)
 
-%.o: %.cxx
-	$(CC) $(CFLAGS) -c $<
+$(OBJ)/%.o: $(SRC)/%.cxx $(OBJ)
+	$(CC) $(CFLAGS) -o $@ -c $< -I.
+
+$(OBJ):
+	mkdir -p $(OBJ)
 
 clean:
-	rm -f test.exe liblitepqxx.so *.o
+	rm -f test.exe liblitepqxx.so
+	rm -rf $(OBJ)
 
