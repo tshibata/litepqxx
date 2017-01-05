@@ -72,7 +72,6 @@ void work::exec(sqlite3_stmt * stmt, result & r) {
 
 result work::exec(const std::string & q) {
 	sqlite3_stmt *stmt = NULL;
-	int status;
 	result r;
 
 	check_sqlite3(sqlite3_prepare_v2(this->conn->db, q.c_str(), q.length(), &stmt, NULL));
