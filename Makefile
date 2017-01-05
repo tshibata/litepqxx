@@ -13,10 +13,10 @@ all: test.exe
 test.exe: test.cxx liblitepqxx.so
 	$(CC) $(CFLAGS) -o test.exe test.cxx -L. -lCppUTest -llitepqxx -lsqlite3
 
-liblitepqxx.so: $(OBJFILES)
+liblitepqxx.so: $(OBJ) $(OBJFILES)
 	$(CC) $(CFLAGS) -shared -o liblitepqxx.so $(OBJFILES)
 
-$(OBJ)/%.o: $(SRC)/%.cxx $(OBJ)
+$(OBJ)/%.o: $(SRC)/%.cxx
 	$(CC) $(CFLAGS) -o $@ -c $< -I.
 
 $(OBJ):
