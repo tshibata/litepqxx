@@ -83,6 +83,9 @@ result work::exec(const std::string & q) {
 }
 
 prepare::invocation work::prepared(const std::string & name) {
+	if (conn->prepared->count(name) == 0) {
+		throw argument_error();
+	}
 	std::string statement = (* conn->prepared)[name];
 	sqlite3_stmt * stmt;
 	check_sqlite3(sqlite3_prepare_v2(conn->db, statement.c_str(), statement.length(), &stmt, NULL)); // prepare sqlite3_stmt for each execution.

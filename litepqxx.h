@@ -135,7 +135,16 @@ public:
 	prepare::invocation prepared(const std::string & name);
 };
 
-class sql_error: std::exception {
+class pqxx_exception: std::exception {
+};
+
+class argument_error: pqxx_exception {
+};
+
+class failure: pqxx_exception {
+};
+
+class sql_error: failure {
 };
 
 class insufficient_resources: sql_error {

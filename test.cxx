@@ -371,6 +371,17 @@ TEST(GeneralTests, PreparedSyntaxError)
 	}
 }
 
+TEST(GeneralTests, NotPrepared)
+{
+	pqxx::connection C(":memory:");
+	try {
+		pqxx::work W(C);
+		pqxx::result R1 = W.prepared("none").exec();
+		FAIL("pqxx::argument_error is expected");
+	} catch (const pqxx::argument_error & ex) {
+	}
+}
+
 int main(int argc, char** argv)
 {
 	return CommandLineTestRunner::RunAllTests(argc, argv);
