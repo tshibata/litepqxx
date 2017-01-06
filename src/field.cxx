@@ -15,7 +15,7 @@ bool result::field::is_null () const {
 }
 
 template<typename T> T result::field::as () const {
-	return (T)0; // error
+	throw failure(); // overridden, or unknown type
 }
 
 template<> int result::field::as () const {
@@ -31,20 +31,21 @@ template<> std::string result::field::as () const {
 }
 
 int result::field::as_integer() const {
-	return 0; // error
+	throw failure(); // overridden, or incompatible type
 }
 
 double result::field::as_float() const {
-	return 0; // error
+	throw failure(); // overridden, or incompatible type
 }
 
 std::string result::field::as_text() const {
-	return ""; // error
+	throw failure(); // overridden, or incompatible type
 }
 
 result::integer_field::integer_field(int value) {
 	this->value = value;
 }
+
 int result::integer_field::as_integer() const {
 	return value;
 }
