@@ -1,4 +1,3 @@
-#include <iostream>
 #include "litepqxx.h"
 
 namespace lite
