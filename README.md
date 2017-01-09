@@ -10,6 +10,14 @@ Litepqxx is (planned to be) a wrapper library to access SQLite3 via API compatib
 * It does not (yet?) cover the whole API.
 * Sqlite3 has "BLOB" instead of "BYTEA".
 * affected_rows() works properly only in case of INSERT, UPDATE or DELETE. (In other cases, it returns value left by the last execution of such statements)
-* It throws syntax_error instead of the subclasses, i.e undefined_column, undefined_function and undefined_table.
-* It throws integrity_constraint_violation instead of the subclasses, i.e. check_violation, foreign_key_violation, not_null_violation, restrict_violation and unique_violation.
+* It throws syntax_error instead of the subclasses, i.e
+    * undefined_column
+    * undefined_function
+    * undefined_table.
+* It throws integrity_constraint_violation instead of the subclasses, i.e.
+    * check_violation
+    * foreign_key_violation
+    * not_null_violation
+    * restrict_violation
+    * unique_violation.
 
